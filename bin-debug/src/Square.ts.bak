@@ -1,0 +1,76 @@
+/**
+ * Created by easymobi_ on 2014/7/29.
+ */
+module Pinaotilesgame
+{
+    export class Square extends egret.DisplayObjectContainer
+    {
+        /**stage宽*/
+        private stageW:number;
+
+        /**stage高*/
+        private stageH:number;
+
+	/**钢琴块方格引用*/
+        private squareArr:egret.Sprite[];
+
+        /**行数*/
+        public rows:number = 4;
+
+	/**列数*/
+        public cols:number = 4;
+
+	/**宽度*/
+        public width:number = 120;
+
+	/**高度*/
+        public height:number = 240;
+
+	/**控制滚动速度*/
+        private speed:number = 2;
+
+	public constructor()
+	{
+            super();
+            this.addEventListener(egret.Event.ADDED_TO_STAGE,this.onAddToStage,this);
+        }
+
+        /**初始化*/
+        private onAddToStage(event:egret.Event)
+	{
+            this.removeEventListener(egret.Event.ADDED_TO_STAGE,this.onAddToStage,this);
+            this.stageW = this.stage.stageWidth;
+            this.stageH = this.stage.stageHeight;
+
+	    this.squareArr = [];
+
+	    for(var row:number=0; row< this.rows; row++)
+
+		var index:number = Math.floor(Math.random()*this.cols);
+		for(var col:number=0; col< this.cols; col++)
+		{
+			var square:egret.Sprite = new egret.Sprite();
+			square.width = this.width;
+			square.height = this.height;
+			square.x = col*this.width;
+			square.y = row*this.height;
+
+			if(index == col)
+			{
+				square.graphics.beginFill(0x000000, 1);
+			}
+			else
+			{
+				square.graphics.beginFill(0xffffff, 1);
+			}
+
+			square.graphics.drawRect(square.x,square.y,square.width,square.height);
+			square.graphics.endFill();
+			this.squareArr.push(square);
+			this.addChild(square);
+		}
+	    }
+	}
+
+    }
+}

@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>HelloWorld</title>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no,target-densitydpi=device-dpi"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+
+    <meta name="full-screen" content="true"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <meta name="x5-fullscreen" content="true"/>
+    <meta name="360-fullscreen" content="true"/>
+    <base href="../"/>
+
+    <style>
+        body {
+            text-align: center;
+            background: #000000;
+            padding: 0;
+            border: 0;
+            margin: 0;
+            height: 100%;
+        }
+        html {
+            -ms-touch-action: none; /* Direct all pointer events to JavaScript code. */
+        }
+    </style>
+</head>
+<body onload="init()">
+<div style="display:inline-block;width:100%; height:100%;margin: 0 auto; background: black; position:relative;"
+     id="gameDiv">
+    <canvas id="gameCanvas" width="480" height="800" style="background-color: #000000"></canvas>
+</div>
+<script>var document_class = "GameApp";</script><!--这部分内容在编译时会被替换，要修改文档类，请到工程目录下的egretProperties.json内编辑。-->
+<script src="/pianotilesgame/launcher/WeixinAPI.js" async="false"></script>
+<script src="bin-debug/lib/egret_file_list.js"></script>
+<script src="launcher/egret_loader.js"></script>
+<script src="bin-debug/src/game_file_list.js"></script>
+
+<script>
+    egret_h5.preloadScript(egret_file_list, "libs/core/");
+    egret_h5.preloadScript(game_file_list, "bin-debug/src/");
+    egret_h5.startLoading();
+</script>
+
+
+
+
+	<header id="header" class="SoundJS">
+	    <h1><span class="text-product">Sound<strong>JS</strong></span> Mobile Safe Play</h1>
+	    <p>This example registers and plays a sound with SoundJS in a way that will work on mobile devices.</p>
+	</header>
+
+	<div class="content" id="content">
+		<h1 id="status">Hello World.</h1>
+	</div>
+
+	<div id="error">
+		<h1>Sorry!</h1>
+		<p>SoundJS is not currently supported in your browser.</p>
+		<p>Please <a href="http://github.com/CreateJS/SoundJS/issues" target="_blank">log a bug</a>
+			with the device and browser you are using.  Thank you.</p>
+	</div>
+
+	<!-- Note: All SoundJS classes are listed here: -->
+	<script type="text/javascript" src="launcher/soundjs/createjs/utils/Proxy.js"></script>
+	<script type="text/javascript" src="launcher/soundjs/createjs/utils/IndexOf.js"></script>
+	<script type="text/javascript" src="launcher/soundjs/createjs/utils/definePropertySupported.js"></script>
+	<script type="text/javascript" src="launcher/soundjs/createjs/events/Event.js"></script>
+	<script type="text/javascript" src="launcher/soundjs/createjs/events/EventDispatcher.js"></script>
+    <script type="text/javascript" src="launcher/soundjs/soundjs/Sound.js"></script>
+    <script type="text/javascript" src="launcher/soundjs/soundjs/WebAudioPlugin.js"></script>
+    <script type="text/javascript" src="launcher/soundjs/soundjs/HTMLAudioPlugin.js"></script>
+
+    <!-- We also provide hosted minified versions of all CreateJS libraries.
+        http://code.createjs.com -->
+
+    <script>
+		var displayMessage;		// the HTML element we use to display messages to the user
+
+		function init() {
+			if (window.top != window) {
+				document.getElementById("header").style.display = "none";
+			}
+
+			// store this off because walking the DOM to get the reference is expensive
+			displayMessage = document.getElementById("status");
+
+			// if this is on mobile, sounds need to be played inside of a touch event
+			if (createjs.Sound.BrowserDetect.isIOS || createjs.Sound.BrowserDetect.isAndroid || createjs.Sound.BrowserDetect.isBlackberry) {
+				//document.addEventListener("click", handleTouch, false);	// works on Android, does not work on iOS
+				displayMessage.addEventListener("click", handleTouch, false);	// works on Android and iPad
+				displayMessage.innerHTML = "Touch to Start";
+			}
+			else {
+				handleTouch(null);
+			}
+		}
+
+		// launch the app inside of this scope
+		function handleTouch(event) {
+			displayMessage.removeEventListener("click", handleTouch, false);
+			// launch the app by creating it
+			var thisApp = new myNameSpace.MyApp();
+		}
+
+		// create a namespace for the application
+		this.myNameSpace = this.myNameSpace || {};
+
+		// this is a function closure
+		(function() {
+			// the application
+			function MyApp() {
+				this.init();
+			}
+
+			MyApp.prototype = {
+				src:null,            // the audio src we are trying to play
+				soundInstance:null,  // the soundInstance returned by Sound when we create or play a src
+				displayStatus:null,  // the HTML element we use to display messages to the user
+				loadProxy:null,
+
+				init: function () {
+					// store the DOM element so we do repeatedly pay the cost to look it up
+					this.displayStatus = document.getElementById("status");
+
+					// this does two things, it initializes the default plugins, and if that fails the if statement triggers and we display an error
+					// NOTE that WebAudioPlugin plays an empty sound when initialized, which activates web audio on iOS if played inside of a function with a touch event in its callstack
+					if (!createjs.Sound.initializeDefaultPlugins()) {
+						document.getElementById("error").style.display = "block";
+						document.getElementById("content").style.display = "none";
+						return;
+					}
+
+					// Create a single item to load.
+					var assetsPath = "launcher/soundjs/sound/";
+					this.src = assetsPath+"11.ogg";
+
+					this.displayStatus.innerHTML = "Waiting for load to complete.";  // let the user know what's happening
+					// NOTE createjs.proxy is used to apply scope so we stay within the touch scope, allowing sound to play on mobile devices
+					this.loadProxy = createjs.proxy(this.handleLoad, this);
+					createjs.Sound.alternateExtensions = ["mp3"];	// add other extensions to try loading if the src file extension is not supported
+					createjs.Sound.addEventListener("fileload", this.loadProxy); // add event listener for when load is completed.
+					createjs.Sound.registerSound(this.src);  // register sound, which preloads by default
+
+					return this;
+				},
+
+				// play a sound inside
+				handleLoad: function (event) {
+					this.soundInstance = createjs.Sound.play(event.src);	// start playback and store the soundInstance we are currently playing
+					this.displayStatus.innerHTML = "Playing source: " + event.src;  // let the user know what we are playing
+					createjs.Sound.removeEventListener("fileload", this.loadProxy);	// we only load 1 sound, so remove the listener
+				},
+				playMusic2: function () {
+					//createjs.Sound.play('launcher/soundjs/sound/18-machinae_supremacy-lord_krutors_dominion.ogg');	// start playback and store the soundInstance we are currently playing
+					//this.displayStatus.innerHTML = "Playing source: " + src;  // let the user know what we are playing
+					//createjs.Sound.removeEventListener("fileload", this.loadProxy);	// we only load 1 sound, so remove the listener
+				}
+
+			}
+
+			// add MyApp to myNameSpace
+			myNameSpace.MyApp = MyApp;
+		}());
+
+	function playMusic(src)
+	{
+		//alert('aa');
+			//		var thisApp = new myNameSpace.MyApp();
+				//	thisApp.playMusic2();
+
+		//createjs.Sound.play("launcher/soundjs/sound/18-machinae_supremacy-lord_krutors_dominion.ogg");
+		//this.displayStatus.innerHTML = "Playing source: " + src; 
+	}
+    </script>
+</body>
+</html>
+</body>
+</html>

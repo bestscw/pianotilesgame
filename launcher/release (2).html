@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>钢琴块</title>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no,target-densitydpi=device-dpi"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+
+    <meta name="full-screen" content="true"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <meta name="x5-fullscreen" content="true"/>
+    <meta name="360-fullscreen" content="true"/>
+    <base href="../"/>
+
+    <style>
+        body {
+            text-align: center;
+            background: #ffffff;
+            padding: 0;
+            border: 0;
+            margin: 0;
+            height: 100%;
+        }
+
+        html {
+            -ms-touch-action: none; /* Direct all pointer events to JavaScript code. */
+        }
+    </style>
+	<script>
+	    var language = window.navigator.userLanguage || window.navigator.language;
+        if(language != undefined)
+        {
+            if(language.toLowerCase() == "zh-cn")
+            {
+                document.title='别踩白块儿';
+            }
+            else if(language.toLowerCase() == "ja-jp")
+            {
+                document.title='ピアノタイルズ';
+            }
+            else if(language.toLowerCase() == "zh-tw")
+            {
+                document.title='別踩白塊兒';
+            }
+            else
+            {
+                document.title='Piano Tiles';
+            }
+        }
+		else
+		{
+			 document.title='Piano Tiles';
+		}
+		</script>
+</head>
+<body onload="init()">
+<div style="position:relative;" id="gameDiv"></div>
+<script>var document_class = "GameApp";</script><!--这部分内容在编译时会被替换，要修改文档类，请到工程目录下的egretProperties.json内编辑。-->
+<script src="/pianotilesgame/launcher/WeixinAPI.js" async="false"></script>
+<script src="/pianotilesgame/launcher/egret_loader.js"></script>
+<script src="/pianotilesgame/launcher/game-min.js"></script>
+<script>
+    egret_h5.startGame();
+</script>
+
+
+
+	<header id="header" class="SoundJS" style="display:none;">
+	    <h1><span class="text-product">Sound<strong>JS</strong></span> Mobile Safe Play</h1>
+	    <p>This example registers and plays a sound with SoundJS in a way that will work on mobile devices.</p>
+	</header>
+
+	<div class="content" id="content" style="display:none;">
+		<h1 id="status">Hello World.</h1>
+	</div>
+
+	<div id="error" style="display:none;">
+		<h1>Sorry!</h1>
+		<p>SoundJS is not currently supported in your browser.</p>
+		<p>Please <a href="http://github.com/CreateJS/SoundJS/issues" target="_blank">log a bug</a>
+			with the device and browser you are using.  Thank you.</p>
+	</div>
+
+	<!-- Note: All SoundJS classes are listed here: -->
+	<script type="text/javascript" src="/pianotilesgame/soundjs/src/createjs/utils/Proxy.js"></script>
+	<script type="text/javascript" src="/pianotilesgame/soundjs/src/createjs/utils/IndexOf.js"></script>
+	<script type="text/javascript" src="/pianotilesgame/soundjs/src/createjs/utils/definePropertySupported.js"></script>
+	<script type="text/javascript" src="/pianotilesgame/soundjs/src/createjs/events/Event.js"></script>
+	<script type="text/javascript" src="/pianotilesgame/soundjs/src/createjs/events/EventDispatcher.js"></script>
+    <script type="text/javascript" src="/pianotilesgame/soundjs/src/soundjs/Sound.js"></script>
+    <script type="text/javascript" src="/pianotilesgame/soundjs/src/soundjs/WebAudioPlugin.js"></script>
+    <script type="text/javascript" src="/pianotilesgame/soundjs/src/soundjs/HTMLAudioPlugin.js"></script>
+
+    <!-- We also provide hosted minified versions of all CreateJS libraries.
+        http://code.createjs.com -->
+
+    <script>
+		var displayMessage;		// the HTML element we use to display messages to the user
+
+		function init() {
+			if (window.top != window) {
+				document.getElementById("header").style.display = "none";
+			}
+
+			// store this off because walking the DOM to get the reference is expensive
+			displayMessage = document.getElementById("status");
+
+			// if this is on mobile, sounds need to be played inside of a touch event
+			if (createjs.Sound.BrowserDetect.isIOS || createjs.Sound.BrowserDetect.isAndroid || createjs.Sound.BrowserDetect.isBlackberry) {
+				handleTouch(null);
+				//document.addEventListener("click", handleTouch, false);	// works on Android, does not work on iOS
+				//displayMessage.addEventListener("click", handleTouch, false);	// works on Android and iPad
+				//displayMessage.innerHTML = "Touch to Start";
+			}
+			else {
+				handleTouch(null);
+			}
+		}
+
+		// launch the app inside of this scope
+		function handleTouch(event) {
+			displayMessage.removeEventListener("click", handleTouch, false);
+			// launch the app by creating it
+			var thisApp = new myNameSpace.MyApp();
+		}
+
+		// create a namespace for the application
+		this.myNameSpace = this.myNameSpace || {};
+
+		// this is a function closure
+		(function() {
+			// the application
+			function MyApp() {
+				this.init();
+			}
+
+			MyApp.prototype = {
+				src:null,            // the audio src we are trying to play
+				soundInstance:null,  // the soundInstance returned by Sound when we create or play a src
+				displayStatus:null,  // the HTML element we use to display messages to the user
+				loadProxy:null,
+
+				init: function () {
+					// store the DOM element so we do repeatedly pay the cost to look it up
+					this.displayStatus = document.getElementById("status");
+
+					// this does two things, it initializes the default plugins, and if that fails the if statement triggers and we display an error
+					// NOTE that WebAudioPlugin plays an empty sound when initialized, which activates web audio on iOS if played inside of a function with a touch event in its callstack
+					if (!createjs.Sound.initializeDefaultPlugins()) {
+						document.getElementById("error").style.display = "block";
+						document.getElementById("content").style.display = "none";
+						return;
+					}
+
+					// Create a single item to load.
+					//var assetsPath = "../assets/";
+					//this.src = assetsPath+"18-machinae_supremacy-lord_krutors_dominion.mp3";
+
+					var audioPath = "/pianotilesgame/resource/assets/";
+					var manifest = [
+						{id:"soundA", src:"soundA.mp3"},
+						{id:"soundB", src:"soundB.mp3"},
+						{id:"soundC", src:"soundC.mp3"},
+						{id:"soundD", src:"soundD.mp3"},
+						{id:"soundE", src:"soundE.mp3"},
+						{id:"soundF", src:"soundF.mp3"},
+						{id:"soundG", src:"soundG.mp3"},
+						{id:"soundH", src:"soundH.mp3"},
+						{id:"soundI", src:"soundI.mp3"},
+
+						{id:"soundJ", src:"soundJ.mp3"},
+						{id:"soundK", src:"soundK.mp3"},
+						{id:"soundL", src:"soundL.mp3"},
+						{id:"soundM", src:"soundM.mp3"},
+						{id:"soundN", src:"soundN.mp3"},
+						{id:"soundO", src:"soundO.mp3"},
+						{id:"soundP", src:"soundP.mp3"},
+						{id:"soundQ", src:"soundQ.mp3"},
+						{id:"soundR", src:"soundR.mp3"},
+
+						{id:"soundS", src:"soundS.mp3"},
+						{id:"soundT", src:"soundT.mp3"},
+						{id:"soundU", src:"soundU.mp3"},
+						{id:"soundV", src:"soundV.mp3"},
+						{id:"soundW", src:"soundW.mp3"},
+						{id:"soundX", src:"soundX.mp3"},
+						{id:"soundY", src:"soundY.mp3"},
+						{id:"soundZ", src:"soundZ.mp3"},
+						{id:"cheer", src:"cheer.mp3"},
+
+					];
+
+					this.displayStatus.innerHTML = "Waiting for load to complete.";  // let the user know what's happening
+					// NOTE createjs.proxy is used to apply scope so we stay within the touch scope, allowing sound to play on mobile devices
+					this.loadProxy = createjs.proxy(this.handleLoad, this);
+					createjs.Sound.alternateExtensions = ["mp3"];	// add other extensions to try loading if the src file extension is not supported
+					createjs.Sound.addEventListener("fileload", this.loadProxy); // add event listener for when load is completed.
+					createjs.Sound.registerManifest(manifest, audioPath);
+
+					//createjs.Sound.registerSound(this.src);  // register sound, which preloads by default
+
+					return this;
+				},
+
+				// play a sound inside
+				handleLoad: function (event) {
+					this.soundInstance = createjs.Sound.play(event.src);	// start playback and store the soundInstance we are currently playing
+					this.displayStatus.innerHTML = "Playing source: " + event.src;  // let the user know what we are playing
+					createjs.Sound.removeEventListener("fileload", this.loadProxy);	// we only load 1 sound, so remove the listener
+				}
+
+			}
+
+			// add MyApp to myNameSpace
+			myNameSpace.MyApp = MyApp;
+		}());
+
+	function playMusic(src)
+	{
+		var audioPath = "/pianotilesgame/resource/assets/";
+		src = audioPath + src
+		createjs.Sound.play(src);
+		//this.displayStatus.innerHTML = "Playing source: " + event.src; 
+	}
+	function share()
+	{
+		window.location.href="https://www.facebook.com/dialog/feed?app_id=145634995501895&display=popup&caption=An%20example%20caption&link=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fdialogs%2F&redirect_uri=https://developers.facebook.com/tools/explorer";
+	}
+    </script>
+
+</body>
+</html>

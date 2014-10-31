@@ -1,0 +1,18 @@
+{
+	"document_class": "GameApp",
+	"native": {
+		"path_ignore": []
+	},
+	"modules": [
+		{
+			"name": "core"
+		},
+		{
+			"name": "gui"
+		},
+		{
+			"name": "dragonbones"
+		}
+	],
+	"egret_version": "1.1.1"
+}

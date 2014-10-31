@@ -1,0 +1,21 @@
+{
+"resources":
+    [
+	{"name":"soundcheer","type":"sound","url":"assets/soundA/soundcheer.mp3"},
+	{"name":"soundAirdpoint","type":"sound","url":"assets/soundA/soundAirdpoint.mp3"},
+	{"name":"sounderror","type":"sound","url":"assets/soundA/sounderror.mp3"},
+	{"name":"soundover","type":"sound","url":"assets/soundA/soundover.mp3"},
+	{"name":"click","type":"sound","url":"assets/soundA/click.mp3"},
+	{"name":"button_back","type":"image","url":"assets/icon_arrow.png"},
+	{"name":"shareTips","type":"image","url":"assets/shareTips.png"},
+	{"name":"blackImage","type":"image","url":"assets/black.png"},
+	{"name":"whiteImage","type":"image","url":"assets/white2.jpg"}
+
+    ],
+
+"groups":
+    [
+	{"name":"soundRes","keys":"click,soundcheer,soundAirdpoint,sounderror,soundover,button_back,shareTips,blackImage,whiteImage"}
+    ]
+}
+
